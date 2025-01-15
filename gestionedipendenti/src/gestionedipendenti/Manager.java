@@ -16,130 +16,117 @@ public class Manager extends Employee {
 		this.teamGestito = teamGestito;
 	}
 
-	public static void insertEmployee(Connection conn) {
 
-		System.out.println("Nome del dipendente: ");
+	public static void getTeams(Connection conn) {
+		        String sql = "SELECT idteam, nometeam FROM team";
+		        try (
+		             Statement stmt = conn.createStatement();
+		             ResultSet rs = stmt.executeQuery(sql)) {
+
+		            System.out.println("Elenco team:");
+		            while (rs.next()) {
+		                int id = rs.getInt("idteam");
+		                String name = rs.getString("nometeam");
+
+		                System.out.printf("ID: %d | Nome Team: %s\n",
+		                        id, name);
+		            }
+
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+
+	}
+	
+	public static void getAssignedEmployees(Connection conn) {
+		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, team.nometeam, ruolo "
+				+ "FROM dipendenti "
+				+ "LEFT JOIN gestioneteam "
+				+ "ON dipendenti.iddipendenti = gestioneteam.iddipendente1 "
+				+ "LEFT JOIN team "
+				+ "ON team.idteam = gestioneteam.idteam1 "
+				+ "WHERE team.nometeam IS NOT NULL "
+				+ "ORDER BY nometeam "
+				
+				;
+		
+		try (
+	             Statement stmt = conn.createStatement();
+	             ResultSet rs = stmt.executeQuery(sql)) {
+
+	            System.out.println("Elenco dipendenti assegnati al team:");
+	            while (rs.next()) {
+	                int id = rs.getInt("iddipendenti");
+	                String name = rs.getString("nomedipendente");
+	                String cognome = rs.getString("cognomedipendente");
+	                String team = rs.getString("nometeam");
+	                String ruolo = rs.getString("ruolo");
+	                
+	               
+
+	                System.out.printf("ID: %d | Nome: %s %s | Team: %s | Ruolo: %s \n",
+	                        id, name, cognome, team, ruolo);
+	            }
+
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	}
+	
+	
+	public static void insertTeam(Connection conn) {
+
+
+		System.out.println("Nome del nuovo team: ");
 		String nome = scan.nextLine();
-		System.out.println("Cognome del dipendente: ");
-		String cognome = scan.nextLine();
-		System.out.println("Stipendio del dipendente: ");
-		double stipendio = scan.nextDouble();
-		System.out.println("Ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
-		int ruoloInt = scan.nextInt();
 
-		String ruolo = "";
-
-		if (ruoloInt == 1)
-			ruolo = "Dipendente";
-		else if (ruoloInt == 2)
-			ruolo = "Sviluppatore";
-		else if (ruoloInt == 3)
-			ruolo = "Manager";
-
-		String query = "INSERT INTO dipendenti (nomedipendente, cognomedipendente, stipendiobase, ruolo) VALUES(?, ?, ?, ?)";
+		String query = "INSERT INTO team (nometeam) VALUES(?)";
 
 		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
 			pstmt.setString(1, nome);
-			pstmt.setString(2, cognome);
-			pstmt.setDouble(3, stipendio);
-			pstmt.setString(4, ruolo);
 			int affectedRows = pstmt.executeUpdate();
 
 			if (affectedRows == 0) {
-				throw new SQLException("Creazione dipendente fallita, nessuna riga aggiunta.");
+				throw new SQLException("Creazione team fallita, nessuna riga aggiunta.");
 			} else {
-				System.out.println("Dipendente aggiunto con successo");
+				System.out.println("Team aggiunto con successo");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
-
-	public static void updateEmployeeRole(Connection conn) {
-
-		System.out.println("ID del dipendente: ");
-		int id = scan.nextInt();
-		scan.nextLine();
-		System.out.println("Nuovo ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
-		int nuovoRuoloInt = scan.nextInt();
-		scan.nextLine();
-		String nuovoRuolo = "";
-		if (nuovoRuoloInt == 1)
-			nuovoRuolo = "Dipendente";
-		else if (nuovoRuoloInt == 2)
-			nuovoRuolo = "Sviluppatore";
-		else if (nuovoRuoloInt == 3)
-			nuovoRuolo = "Manager";
-
-		String query = "UPDATE dipendenti SET ruolo = ? WHERE iddipendenti = ?";
+	
+	public static void assignTeam(Connection conn) {
+		
+		System.out.println("Inserisci l'ID del dipendente che vuoi assegnare a un team: ");
+		Employee.readAllEmployees(conn);
+		int idDipendente = scan.nextInt();
+		
+		System.out.println("Inserisci l'ID del team: ");
+		getTeams(conn);
+		int idTeam = scan.nextInt();
+		
+		String query = "INSERT INTO gestioneteam (iddipendente1, idteam1) VALUES(?, ?)";
 
 		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-			pstmt.setString(1, nuovoRuolo);
-			pstmt.setInt(2, id);
+			pstmt.setInt(1, idDipendente);
+			pstmt.setInt(2, idTeam);
 			int affectedRows = pstmt.executeUpdate();
 
 			if (affectedRows == 0) {
-				throw new SQLException("Modifica dipendente fallita, nessuna riga aggiunta.");
+				throw new SQLException("Creazione team fallita, nessuna riga aggiunta.");
 			} else {
-				System.out.println("Dipendente modificato con successo");
+				System.out.println("Dipendente assegnato con successo");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 	}
-
-	public static void updateEmployeeSalary(Connection conn) {
-
-		System.out.println("ID del dipendente: ");
-		int id = scan.nextInt();
-		scan.nextLine();
-		System.out.println("Nuovo stipendio del dipendente:  ");
-		double stipendio = scan.nextDouble();
-
-		String query = "UPDATE dipendenti SET stipendioBase = ? WHERE iddipendenti = ?";
-
-		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-			pstmt.setDouble(1, stipendio);
-			pstmt.setInt(2, id);
-			int affectedRows = pstmt.executeUpdate();
-
-			if (affectedRows == 0) {
-				throw new SQLException("Modifica dipendente fallita, nessuna riga aggiunta.");
-			} else {
-				System.out.println("Dipendente modificato con successo");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void deleteEmployee(Connection conn) {
-
-		System.out.println("ID del dipendente: ");
-		int id = scan.nextInt();
-		scan.nextLine();
-
-		String query = "DELETE from dipendenti WHERE iddipendenti = ?";
-
-		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-			pstmt.setInt(1, id);
-			int affectedRows = pstmt.executeUpdate();
-
-			if (affectedRows == 0) {
-				throw new SQLException("Modifica dipendente fallita, nessuna riga aggiunta.");
-			} else {
-				System.out.println("Dipendente eliminato con successo");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
+	
+	
 
 }

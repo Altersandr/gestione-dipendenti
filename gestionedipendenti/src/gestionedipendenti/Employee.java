@@ -24,7 +24,7 @@ public class Employee {
 	}
 	
 	   public static void readAllEmployees(Connection conn) {
-	        String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, stipendiobase, ruolo FROM dipendenti";
+	        String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, stipendiobase, ruolo, bonus FROM dipendenti LEFT JOIN manager ON dipendenti.iddipendenti = manager.idmanager";
 	        try (
 	             Statement stmt = conn.createStatement();
 	             ResultSet rs = stmt.executeQuery(sql)) {
@@ -34,9 +34,11 @@ public class Employee {
 	                int id = rs.getInt("iddipendenti");
 	                String name = rs.getString("nomedipendente");
 	                String cognome = rs.getString("cognomedipendente");
-	                double stipendio = rs.getDouble("stipendiobase");
 	                String ruolo = rs.getString("ruolo");
-	               
+	                double stipendioBase = rs.getDouble("stipendiobase");
+	                System.out.println(ruolo);
+	                
+	                double stipendio = ruolo.equals("Manager") ? stipendioBase * (rs.getDouble("bonus")/100+1): stipendioBase;
 
 	                System.out.printf("ID: %d | Nome: %s | Cognome: %s | Stipendio: %.2f | Ruolo: %s \n",
 	                        id, name, cognome, stipendio, ruolo);
@@ -171,6 +173,10 @@ public class Employee {
 				e.printStackTrace();
 			}
 
+		}
+		
+		public static void closeScanner() {
+			scan.close();
 		}
 
 }
