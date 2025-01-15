@@ -13,31 +13,44 @@ public class Main {
 		Scanner scan = new Scanner(System.in);
 		
 		System.out.println("Che azione vuoi eseguire? "
-				+ "\n1. Aggiungere dipendente "
-				+ "\n2. Modificare ruolo del dipendente "
-				+ "\n3. Modificare stipendio del dipendente "
-				+ "\n4. Eliminare dipendente "
-				+ "\n5. Mostra la lista dei team "
-				+ "\n6. Aggiungere team "
-				+ "\n7. Assegna dipendente a un team"
-				+ "\n8. Visualizza dipendenti assegnati"
-				+ "\n99. Mostra lista dipendenti ");
+				+ "\n1. Azione su dipendente "
+				+ "\n2. Azione su manager"
+				+ "\n3. Azione su developer"
+				+ "\n0. Uscire dal menu");
+				
 		
 		int scelta = scan.nextInt();
 		scan.nextLine();
 		
+		
+		
 		switch(scelta) {
 		case 1:
-			Manager.insertEmployee(conn);
-			break;
+			System.out.println("Lista azioni che si possono svolgere su dipendente ");
+			switch (scelta) {
+				case 1:
+					Employee.insertEmployee(conn);
+					break;
+				case 2:
+					Employee.updateEmployeeSalary(conn);
+					break;
+				case 3: 
+					Employee.deleteEmployee(conn);
+					break;
+				case 4: 
+					Employee.readAllEmployees(conn);
+					break;
+					
+			}
+
 		case 2:
-			Manager.updateEmployeeRole(conn);
+			Employee.updateEmployeeRole(conn);
 			break;
 		case 3:
-			Manager.updateEmployeeSalary(conn);
+			Employee.updateEmployeeSalary(conn);
 			break;
 		case 4:
-			Manager.deleteEmployee(conn);
+			Employee.deleteEmployee(conn);
 			break;
 		case 5:
 			Team.getTeams(conn);
@@ -52,7 +65,7 @@ public class Main {
 			Team.getAssignedEmployees(conn);
 			break;
 		case 99:
-			Employee.readAllDipendenti(conn);
+			Employee.readAllEmployees(conn);
 			break;
 		}
 		

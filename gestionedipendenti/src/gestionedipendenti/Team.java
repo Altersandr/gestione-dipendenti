@@ -33,14 +33,14 @@ public class Team {
 	}
 	
 	public static void getAssignedEmployees(Connection conn) {
-		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, nometeam, ruolo "
+		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, team.nometeam, ruolo "
 				+ "FROM dipendenti "
 				+ "LEFT JOIN gestioneteam "
 				+ "ON dipendenti.iddipendenti = gestioneteam.iddipendente1 "
 				+ "LEFT JOIN team "
 				+ "ON team.idteam = gestioneteam.idteam1 "
-				+ "WHERE team.nometeam IS NOT NULL"
-				+ "ORDER BY team.nometeam"
+				+ "WHERE team.nometeam IS NOT NULL "
+				+ "ORDER BY nometeam "
 				
 				;
 		
@@ -95,7 +95,7 @@ public class Team {
 	public static void assignTeam(Connection conn) {
 		
 		System.out.println("Inserisci l'ID del dipendente che vuoi assegnare a un team: ");
-		Manager.readAllDipendenti(conn);
+		Employee.readAllEmployees(conn);
 		int idDipendente = scan.nextInt();
 		
 		System.out.println("Inserisci l'ID del team: ");
