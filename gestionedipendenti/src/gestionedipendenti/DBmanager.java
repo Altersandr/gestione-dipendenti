@@ -6,7 +6,7 @@ public class DBmanager {
 
 	    private static final String URL = "jdbc:mysql://localhost:3306/gestionedipendenti"; 
 	    private static final String USER = "root";  
-	    private static final String PW = "WC@[O-I[WJ^RK^.4TDZI"; 
+	    private static final String PW = "Lasolita123"; 
 	    private Connection connection;
 	    
 	    // Construttore
