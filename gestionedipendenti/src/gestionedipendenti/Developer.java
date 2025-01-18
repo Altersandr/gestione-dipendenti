@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Developer extends Employee{
 	ArrayList<String> linguaggiConosciuti;
@@ -63,7 +64,7 @@ public class Developer extends Employee{
 	        }
 	}
 	
-	public static void insertNewLanguage(Connection conn) {
+	public static void insertNewLanguage(Connection conn, Scanner scan) {
 		
 		System.out.println("Nome linguaggio: ");
 		String nome = scan.nextLine();
@@ -76,7 +77,7 @@ public class Developer extends Employee{
 			int affectedRows = pstmt.executeUpdate();
 
 			if (affectedRows == 0) {
-				throw new SQLException("Aggiunta linguaggio fallita, nessuna riga aggiunta.");
+				throw new SQLException("Aggiunta linguaggio fallita");
 			} else {
 				System.out.println("Linguaggio aggiunto con successo");
 			}
@@ -94,10 +95,7 @@ public class Developer extends Employee{
 				+ "INNER JOIN linguaggiconosciutti "
 				+ "ON dipendenti.iddipendenti = linguaggiconosciutti.iddipendente "
 				+ "INNER JOIN listalinguaggi "
-				+ "ON listalinguaggi.idlinguaggio = linguaggiconosciutti.idlinguaggio "
-
-				
-				;
+				+ "ON listalinguaggi.idlinguaggio = linguaggiconosciutti.idlinguaggio ";
 		
 		try (
 	             Statement stmt = conn.createStatement();
@@ -109,10 +107,6 @@ public class Developer extends Employee{
 	                String name = rs.getString("nomedipendente");
 	                String cognome = rs.getString("cognomedipendente");
 	                String lista = rs.getString("listalinguaggi.nome");
-	          
-	                
-	               
-
 	                System.out.printf("ID: %d | Nome: %s %s | Linguaggio: %s  \n",
 	                        id, name, cognome, lista);
 	            }
@@ -122,17 +116,37 @@ public class Developer extends Employee{
 	        }
 	}
 	
-	public static void learnLanguage(Connection conn) {
+	public static void learnLanguage(Connection conn, Scanner scan) {
+		boolean valid = false;
+		int idDip = 0;
+		int idLang = 0;
 		
-		System.out.println("ID Dipendente: ");
-		getDevAndLang(conn);
-		int idDip = scan.nextInt();
-		scan.nextLine();
+		do {
+			System.out.println("ID Dipendente: ");
+			if (scan.hasNextInt()) {
+				idDip = scan.nextInt();
+				scan.nextLine();
+				valid = true;
+			} else {
+				scan.nextLine();
+				System.out.println("Errore input, inserire un ID valido");
+			}
+		} while (!valid);
 		
-		System.out.println("ID Linguaggio: ");
-		getLanguageList(conn);
-		int idLang = scan.nextInt();
-		scan.nextLine();
+		do {
+			System.out.println("ID Linguaggio: ");
+			if (scan.hasNextInt()) {
+				idLang = scan.nextInt();
+				scan.nextLine();
+				valid = true;
+			} else {
+				valid = false;
+				scan.nextLine();
+				System.out.println("Errore input, inserire un ID valido");
+			}
+		} while (!valid);
+		
+		
 		
 		String query = "INSERT INTO linguaggiconosciutti (iddipendente, idlinguaggio) VALUES(?, ?)";
 
@@ -149,87 +163,9 @@ public class Developer extends Employee{
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("Input errati, riprova");
 		}
 		
 	}
-
-	public static void readAllProjects(Connection conn) {
-		
-		  String sql = "SELECT idprogetto, nomeprogetto FROM progetti";
-	        try (
-	             Statement stmt = conn.createStatement();
-	             ResultSet rs = stmt.executeQuery(sql)) {
-
-	            System.out.println("Elenco progetti:");
-	            while (rs.next()) {
-	                int id = rs.getInt("idprogetto");
-	                String name = rs.getString("nomeprogetto");
-
-	                System.out.printf("ID: %d | Nome Progetto: %s\n",
-	                        id, name);
-	            }
-
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	}
-	
-	public static void addProject(Connection conn) {
-		
-		System.out.println("Nome progetto: ");
-		String nomeprog = scan.nextLine();
-		
-		String query = "INSERT INTO progetti (nomeprogetto) VALUES(?)";
-
-		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-			pstmt.setString(1, nomeprog);
-
-
-			int affectedRows = pstmt.executeUpdate();
-
-			if (affectedRows == 0) {
-				throw new SQLException("Aggiunta progetto fallita, nessuna riga aggiunta.");
-			} else {
-				System.out.println("Progetto inserito con successo");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
-	public static void assignTeamToProject(Connection conn) {
-		
-		System.out.println("Inserisci l'ID del team da assegnare a un progetto: ");
-
-		int idTeam = scan.nextInt();
-		scan.nextLine();
-		
-		System.out.println("Inserisci l'ID del progetto: ");
-		readAllProjects(conn);
-		int idProject = scan.nextInt();
-		scan.nextLine();
-		
-		String query = "INSERT INTO progettiassegnati (idteam, idprogetto) VALUES(?, ?)";
-
-		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-			pstmt.setInt(1, idTeam);
-			pstmt.setInt(2, idProject);
-			int affectedRows = pstmt.executeUpdate();
-
-			if (affectedRows == 0) {
-				throw new SQLException("Assegnazione team fallita, nessuna riga aggiunta.");
-			} else {
-				System.out.println("Team assegnato con successo");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 
 }

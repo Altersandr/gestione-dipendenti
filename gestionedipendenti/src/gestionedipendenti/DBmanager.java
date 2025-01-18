@@ -17,14 +17,14 @@ public class DBmanager {
 	    // metodo per aprire la connessione
 	    public Connection openConnection() {
 	        if (connection != null) {
-	            System.out.println("Connection is already established.");
+	            System.out.println("Connessione gia presente. \n");
 	            return connection;
 	        }
 
 	        try {
 
 	            connection = DriverManager.getConnection(URL, USER, PW);
-	            System.out.println("Connection established.\n");
+	            System.out.println("Connessione eseguita.\n");
 	        } catch (SQLException e) {
 	            System.err.println("SQL Exception: " + e.getMessage());
 	        }
@@ -37,12 +37,12 @@ public class DBmanager {
 	            try {
 	                connection.close();
 	                connection = null;
-	                System.out.println("Connection closed.");
+	                System.out.println("Chiusura connessione\n");
 	            } catch (SQLException e) {
-	                System.err.println("Error closing connection: " + e.getMessage());
+	                System.err.println("Errore, non e stato possibile chiudere la connessione: " + e.getMessage());
 	            }
 	        } else {
-	            System.out.println("No connection to close.");
+	            System.out.println("Nessuna connessione da chiudere");
 	        }
 	    }
 

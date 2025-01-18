@@ -13,8 +13,7 @@ public class Employee {
 	String nome;
 	String cognome;
 	double stipendioBase;
-	static Scanner scan = new Scanner(System.in);
-	
+
 	
 	public Employee (int id, String nome, String cognome, double stipendioBase) {
 		this.id = id;
@@ -29,15 +28,13 @@ public class Employee {
 	             Statement stmt = conn.createStatement();
 	             ResultSet rs = stmt.executeQuery(sql)) {
 
-	            System.out.println("Elenco prodotti:");
+	            System.out.println("Elenco dipendenti:");
 	            while (rs.next()) {
 	                int id = rs.getInt("iddipendenti");
 	                String name = rs.getString("nomedipendente");
 	                String cognome = rs.getString("cognomedipendente");
 	                String ruolo = rs.getString("ruolo");
 	                double stipendioBase = rs.getDouble("stipendiobase");
-	                System.out.println(ruolo);
-	                
 	                double stipendio = ruolo.equals("Manager") ? stipendioBase * (rs.getDouble("bonus")/100+1): stipendioBase;
 
 	                System.out.printf("ID: %d | Nome: %s | Cognome: %s | Stipendio: %.2f | Ruolo: %s \n",
@@ -49,19 +46,45 @@ public class Employee {
 	        }
 	    }
 	   
-	   public static void insertEmployee(Connection conn) {
+	   public static void insertEmployee(Connection conn, Scanner scan) {
+		   
+		   String ruolo = "";
+		   int ruoloInt = 0;
+		   double stipendio = 0;
+		   boolean valid = false;
 
 			System.out.println("Nome del dipendente: ");
-			String nome = scan.nextLine();
+			String nome = scan.next();			
 			System.out.println("Cognome del dipendente: ");
-			String cognome = scan.nextLine();
-			System.out.println("Stipendio del dipendente: ");
-			double stipendio = scan.nextDouble();
-			System.out.println("Ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
-			int ruoloInt = scan.nextInt();
+			String cognome = scan.next();
+			
 
-			String ruolo = "";
-
+			do {
+				System.out.println("Stipendio del dipendente: ");
+				if (scan.hasNextDouble()) {
+					stipendio = scan.nextDouble();
+					scan.nextLine();
+					valid = true;
+				} else {
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
+			
+			
+			do {
+				System.out.println("Ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
+				if (scan.hasNextInt()) {
+					ruoloInt = scan.nextInt();
+					scan.nextLine();
+					valid = true;
+				} else {
+					valid = false;
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
+			
 			if (ruoloInt == 1)
 				ruolo = "Dipendente";
 			else if (ruoloInt == 2)
@@ -79,7 +102,7 @@ public class Employee {
 				int affectedRows = pstmt.executeUpdate();
 
 				if (affectedRows == 0) {
-					throw new SQLException("Creazione dipendente fallita, nessuna riga aggiunta.");
+					throw new SQLException("Aggiunta dipendente fallita");
 				} else {
 					System.out.println("Dipendente aggiunto con successo");
 				}
@@ -90,21 +113,50 @@ public class Employee {
 
 		}
 
-		public static void updateEmployeeRole(Connection conn) {
+		public static void updateEmployeeRole(Connection conn, Scanner scan) {
 
-			System.out.println("ID del dipendente: ");
-			int id = scan.nextInt();
-			scan.nextLine();
-			System.out.println("Nuovo ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
-			int nuovoRuoloInt = scan.nextInt();
-			scan.nextLine();
+			int id = 0;
+			int nuovoRuoloInt = 0;
 			String nuovoRuolo = "";
+			boolean valid = false;
+			
+			
+			do {
+				System.out.println("ID del dipendente: ");
+				if (scan.hasNextInt()) {
+					id = scan.nextInt();
+					scan.nextLine();
+					valid = true;
+				} else {
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
+			
+			
+			do {
+				System.out.println("Nuovo ruolo del dipendente: \n1. Dipendente \n2. Sviluppatore \n3. Manager  ");
+				if (scan.hasNextInt()) {
+					nuovoRuoloInt = scan.nextInt();
+					scan.nextLine();
+					valid = true;
+				} else {
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+					valid = false;
+				}
+			} while (!valid);
+			
+
+			
 			if (nuovoRuoloInt == 1)
 				nuovoRuolo = "Dipendente";
 			else if (nuovoRuoloInt == 2)
 				nuovoRuolo = "Sviluppatore";
-			else if (nuovoRuoloInt == 3)
-				nuovoRuolo = "Manager";
+			else if (nuovoRuoloInt == 3) {
+				
+				//call a method to assign a bonus to the manager that i still need to write 
+				nuovoRuolo = "Manager";}
 
 			String query = "UPDATE dipendenti SET ruolo = ? WHERE iddipendenti = ?";
 
@@ -124,13 +176,36 @@ public class Employee {
 			}
 		}
 
-		public static void updateEmployeeSalary(Connection conn) {
-
-			System.out.println("ID del dipendente: ");
-			int id = scan.nextInt();
-			scan.nextLine();
-			System.out.println("Nuovo stipendio del dipendente:  ");
-			double stipendio = scan.nextDouble();
+		public static void updateEmployeeSalary(Connection conn, Scanner scan) {
+			
+			int id = 0;
+			double stipendio = 0;
+			boolean valid = false;
+			
+			do {
+				System.out.println("ID del dipendente: ");
+				if (scan.hasNextInt()) {
+					id = scan.nextInt();
+					scan.nextLine();
+					valid = true;
+				} else {
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
+			
+			do {
+				System.out.println("Nuovo stipendio del dipendente:  ");
+				if (scan.hasNextDouble()) {
+					stipendio = scan.nextDouble();
+					scan.nextLine();
+					valid = true;
+				} else {
+					valid = false;
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
 
 			String query = "UPDATE dipendenti SET stipendioBase = ? WHERE iddipendenti = ?";
 
@@ -151,11 +226,22 @@ public class Employee {
 
 		}
 
-		public static void deleteEmployee(Connection conn) {
+		public static void deleteEmployee(Connection conn, Scanner scan) {
 
-			System.out.println("ID del dipendente: ");
-			int id = scan.nextInt();
-			scan.nextLine();
+			boolean valid = false;
+			int id = 0;
+
+			do {
+				System.out.println("ID del dipendente: ");
+				if (scan.hasNextInt()) {
+					id = scan.nextInt();
+					scan.nextLine();
+					valid = true;
+				} else {
+					scan.nextLine();
+					System.out.println("Errore input, inserire un ID valido");
+				}
+			} while (!valid);
 
 			String query = "DELETE from dipendenti WHERE iddipendenti = ?";
 
@@ -164,7 +250,7 @@ public class Employee {
 				int affectedRows = pstmt.executeUpdate();
 
 				if (affectedRows == 0) {
-					throw new SQLException("Modifica dipendente fallita, nessuna riga aggiunta.");
+					throw new SQLException("Eliminazione fallita, dipendente non presente \n");
 				} else {
 					System.out.println("Dipendente eliminato con successo");
 				}
@@ -175,8 +261,7 @@ public class Employee {
 
 		}
 		
-		public static void closeScanner() {
-			scan.close();
-		}
+		
+		
 
 }
