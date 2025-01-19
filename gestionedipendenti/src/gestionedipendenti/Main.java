@@ -15,11 +15,11 @@ public class Main {
 		boolean continuaAction = true;
 		int scelta = 0;
 		int scelta1 = 0;
-
 		while (continua) {
 
 			boolean valid = false;
 
+			// Do while che si ripete fin che non si inserisce un input valido
 			do {
 				System.out.println("Che azione vuoi eseguire? " + "\n1. Azione su dipendente "
 						+ "\n2. Azione su manager" + "\n3. Azione su developer" + "\n4. Uscire dal programma");
@@ -39,14 +39,14 @@ public class Main {
 					valid = false;
 				}
 			} while (!valid);
-			
+			continuaAction = true;
 			continua = scelta == 4 ? false: true;
 
 			switch (scelta) {
 			case 1:
 
 				while (continuaAction) {
-					
+					// Do while che si ripete fin che non si inserisce un input valido
 					do {
 						System.out.println("1. Per aggiungere un dipendente\n"
 								+ "2. Per aggiornare lo stipendio base di un dipendente\n"
@@ -68,6 +68,8 @@ public class Main {
 					continuaAction = true;
 			
 					switch (scelta1) {
+					
+					// I vari casi e azioni dal menu del dipendente
 					case 1:
 						Employee.insertEmployee(conn, scan);
 						break;
@@ -78,7 +80,7 @@ public class Main {
 						Employee.updateEmployeeRole(conn, scan);
 						break;
 					case 4:
-						Employee.readAllEmployees(conn);
+						Employee.readAllEmployees(conn, scan);
 						break;
 					case 5:
 						Employee.deleteEmployee(conn, scan);
@@ -95,12 +97,14 @@ public class Main {
 
 				while (continuaAction) {
 					
+					// Do while che si ripete fin che non si inserisce un input valido
+					
 					do {
 						System.out.println("1. Per vedere elenco team \n" + "2. Per vedere elenco dipendenti assegnati \n"
 								+ "3. Per vedere elenco progetti \n" + "4. Per aggiungere un team \n"
 								+ "5. Per assegnare un dipendente al team \n" + "6. Per rimuovere un dipendente dal team \n"
 								+ "7. Per aggiungere un progetto \n" + "8. Per rimuovere un progetto \n"
-								+ "9. Per assegnare progetto a un team \n" + "0. Per tornare indietro \n");
+								+ "9. Per assegnare progetto a un team \n" + "10. Per assegnare manager a un team \n" + "0. Per tornare indietro \n");
 						if (scan.hasNextInt()) {
 							scelta1 = scan.nextInt();
 							scan.nextLine();
@@ -115,6 +119,8 @@ public class Main {
 					continuaAction = true;
 					
 					switch (scelta1) {
+					
+					// I vari casi e azioni dal menu del manager
 					case 1:
 						Manager.getTeams(conn);
 						;
@@ -147,20 +153,23 @@ public class Main {
 					case 9:
 						Manager.assignTeamToProject(conn, scan);
 						break;
+					case 10:
+						Manager.assignManagerToTeam(conn, scan);
+						break;
 					case 0:
 						continua = true;
 						continuaAction = false;
 						break;
 					default:
+						continuaAction = true;
 						continue;
-
 					}
 				}
 
 			case 3:
 					while (continuaAction) {
 						
-						
+						// Do while che si ripete fin che non si inserisce un input valido
 						do {
 							System.out.println("1. Per vedere elenco sviluppatori \n" 
 									+ "2. Per la lista dei linguaggi \n"
@@ -181,6 +190,8 @@ public class Main {
 						continuaAction = true;
 
 						switch (scelta1) {
+						
+						// I vari casi e azioni dal menu del sviluppatore
 						case 1:
 							Developer.readAllDevelopers(conn);
 							break;
@@ -204,9 +215,12 @@ public class Main {
 					}
 
 			case 4:
+				
+				// Verifica se si vuole continuare a fare azioni
 				if(!continua)break;
 				else if(continuaAction) continue;
 				else break;
+				default: continue;
 			}
 		}
 		System.out.println("Program has been terminated!");

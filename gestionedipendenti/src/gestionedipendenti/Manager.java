@@ -14,6 +14,12 @@ public class Manager extends Employee {
 		this.bonus = bonus;
 		this.teamGestito = teamGestito;
 	}
+	
+	
+	   /*
+	    * Stampa tutti i Team presenti nella tabella TEAM.
+	   */
+	
 
 	public static void getTeams(Connection conn) {
 		String sql = "SELECT idteam, nometeam FROM team";
@@ -32,6 +38,10 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	   /*
+	    * Stampa tutti i dipendenti che sono stati assegnati al team.
+	   */
 
 	public static void getAssignedEmployees(Connection conn) {
 		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, team.nometeam, ruolo "
@@ -58,6 +68,12 @@ public class Manager extends Employee {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+     * Inserisce un nuovo team nella tabella TEAM.
+     *
+     * @param nome        Nome del TEAM
+     */
 
 	public static void insertTeam(Connection conn, Scanner scan) {
 
@@ -81,6 +97,14 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	 /**
+     * Assegna un dipendente a un team.
+     *
+     * @param idDipendente      L'id del dipendente
+     * @param idTeam      		L'id del team
+     */
+	
 
 	public static void assignTeam(Connection conn, Scanner scan) {
 		int idDipendente = -1;
@@ -131,6 +155,14 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	
+	/**
+     * Rimuove un dipendente dal team.
+     *
+     * @param idDipendente      L'id del dipendente
+     */
+	
 
 	public static void removeFromTeam(Connection conn, Scanner scan) {
 		int idDipendente = -1;
@@ -167,6 +199,9 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	
+	// Legge e stampa una lista di tutti i progetti nella tabella PROGETTI
 
 	public static void readAllProjects(Connection conn) {
 
@@ -185,6 +220,13 @@ public class Manager extends Employee {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	/**
+     * Aggiunge nuovo progetto nella tabella PROGETTI.
+     *
+     * @param nomeprog      Nome del nuovo progetto
+     */
 
 	public static void addProject(Connection conn, Scanner scan) {
 
@@ -210,6 +252,12 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	/**
+     * Rimuove progetto dalla tabella PROGETTI.
+     *
+     * @param id     L'id del progetto
+     */
 
 	public static void removeProject(Connection conn, Scanner scan) {
 		boolean valid = false;
@@ -247,6 +295,13 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	/**
+     * Assegna un progetto al team.
+     *
+     * @param idProject      	L'id del progetto
+     * @param idTeam      		L'id del team
+     */
 
 	public static void assignTeamToProject(Connection conn, Scanner scan) {
 
@@ -299,4 +354,91 @@ public class Manager extends Employee {
 		}
 
 	}
+	
+	/**
+     * Assegna un manager a un team.
+     *
+     * @param idManager     	L'id del manager
+     * @param idTeam      		L'id del team
+     * @param bonus     		bonus in % da assegnare
+     */
+	
+	
+	public static void assignManagerToTeam(Connection conn, Scanner scan) {
+		int idManager = 0;
+		int idTeam = 0;
+		int bonus = 0;
+		boolean valid = false;
+		
+		do {
+			System.out.println("Inserisci l'ID del Manager: ");
+			if (scan.hasNextInt()) {
+				idManager = scan.nextInt();
+				scan.nextLine();
+				valid = true;
+			} else {
+				scan.nextLine();
+				System.out.println("Errore input, inserire un ID valido");
+			}
+		} while (!valid);
+		
+		do {
+			System.out.println("Inserisci l'ID del Team: ");
+			if (scan.hasNextInt()) {
+				idTeam = scan.nextInt();
+				scan.nextLine();
+				valid = true;
+			} else {
+				scan.nextLine();
+				System.out.println("Errore input, inserire un ID valido");
+			}
+		} while (!valid);
+		
+		
+		do {
+			System.out.println("Inserisci il bonus: ");
+			if (scan.hasNextInt()) {
+				bonus = scan.nextInt();
+				scan.nextLine();
+				valid = true;
+			} else {
+				scan.nextLine();
+				System.out.println("Input sbagliato, riprovare.\n");
+			}
+		} while (!valid);
+		
+		String query = "UPDATE manager SET idteam = ?, bonus = ? WHERE idmanager = ?";
+		
+		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+			pstmt.setInt(1, idTeam);
+			pstmt.setInt(2, bonus);
+			pstmt.setInt(3, idManager);
+			int affectedRows = pstmt.executeUpdate();
+
+			if (affectedRows == 0) {
+				throw new SQLException("Verificare input, manager non e stato assegnato");
+			} else {
+				System.out.println("Manager assegnato con successo");
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Verificare input, manager non e stato assegnato");
+		}
+	}
+	
+	// Aggiunge tutti i manager nella tabella MANAGER, ignora la entry quando il manager e gia presente 
+	
+	public static void addManager(Connection conn, int id) {
+		String query = "INSERT IGNORE INTO manager (idmanager) VALUES (?)";
+		
+		try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+			pstmt.setInt(1, id);
+			pstmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
 }

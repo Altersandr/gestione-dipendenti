@@ -20,6 +20,8 @@ public class Developer extends Employee{
 		this.progettiAssegnati = progettiAssegnati;
 	}
 	
+	// Stampa tutti i record che abbiano il ruolo Developer dalla tabella DIPENDENTI
+	
 	public static void readAllDevelopers(Connection conn) {
 		
 		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente FROM dipendenti WHERE ruolo = 'Developer' ";
@@ -42,6 +44,7 @@ public class Developer extends Employee{
 	        }
 	}
 	
+	// Stampa la lista dei linguaggi dalla tabella LANGUAGELIST
 	
 	public static void getLanguageList(Connection conn) {
 		
@@ -63,6 +66,12 @@ public class Developer extends Employee{
 	            e.printStackTrace();
 	        }
 	}
+	
+	 /**
+     * Inserisce un nuovo linguaggio nella tabella LANGUAGELIST.
+     *
+     * @param nome   			nome del linguaggio
+     */
 	
 	public static void insertNewLanguage(Connection conn, Scanner scan) {
 		
@@ -88,6 +97,7 @@ public class Developer extends Employee{
 		
 	}
 
+	// Stampa i sviluppatori e i linguaggi che conoscono dalla lista LINGUAGGICONOSCIUTI
 	
 	public static void getDevAndLang(Connection conn) {
 		String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, listalinguaggi.nome "
@@ -115,6 +125,13 @@ public class Developer extends Employee{
 	            e.printStackTrace();
 	        }
 	}
+	
+	 /**
+     * Assegna un linguaggio a un sviluppatore.
+     *
+     * @param idDip    			id del dipendente
+     * @param idLang     		id del linguaggio, deve essere presente nella lista linguaggi
+     */
 	
 	public static void learnLanguage(Connection conn, Scanner scan) {
 		boolean valid = false;

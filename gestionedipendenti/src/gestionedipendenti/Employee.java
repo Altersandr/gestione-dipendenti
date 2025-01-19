@@ -22,7 +22,11 @@ public class Employee {
 		this.stipendioBase = stipendioBase;
 	}
 	
-	   public static void readAllEmployees(Connection conn) {
+	
+	
+	//Stampa tutti i record presenti nella tabella DIPENDENTI
+	
+	   public static void readAllEmployees(Connection conn, Scanner scan) {
 	        String sql = "SELECT iddipendenti, nomedipendente, cognomedipendente, stipendiobase, ruolo, bonus FROM dipendenti LEFT JOIN manager ON dipendenti.iddipendenti = manager.idmanager";
 	        try (
 	             Statement stmt = conn.createStatement();
@@ -35,8 +39,12 @@ public class Employee {
 	                String cognome = rs.getString("cognomedipendente");
 	                String ruolo = rs.getString("ruolo");
 	                double stipendioBase = rs.getDouble("stipendiobase");
-	                double stipendio = ruolo.equals("Manager") ? stipendioBase * (rs.getDouble("bonus")/100+1): stipendioBase;
-
+	                double bonus = rs.getDouble("bonus");
+	                double stipendio = 0;
+	                if(ruolo.equals("Manager")) {
+	                	Manager.addManager(conn, id);
+	                	stipendio = stipendioBase * ((bonus/100)+1);
+	                }else stipendio = stipendioBase;      
 	                System.out.printf("ID: %d | Nome: %s | Cognome: %s | Stipendio: %.2f | Ruolo: %s \n",
 	                        id, name, cognome, stipendio, ruolo);
 	            }
@@ -45,6 +53,17 @@ public class Employee {
 	            e.printStackTrace();
 	        }
 	    }
+	   
+	   
+	   /**
+	     * Inserisce un nuovo dipendente nella tabella DIPENDENTI.
+	     *
+	     * @param nome    			nome del dipendente
+	     * @param cognome      		cognome del dipendente
+	     * @param stipendio      	stipendio base del dipendente
+	     * @param ruolo				ruolo del dipendente
+	     */
+		
 	   
 	   public static void insertEmployee(Connection conn, Scanner scan) {
 		   
@@ -112,6 +131,14 @@ public class Employee {
 			}
 
 		}
+	   
+	   
+	   /**
+	     * Modifica il ruolo del dipendente.
+	     *
+	     * @param id    			id del dipendente
+	     * @param nuovoRuolo     	nuovo ruolo del dipendente
+	     */
 
 		public static void updateEmployeeRole(Connection conn, Scanner scan) {
 
@@ -154,8 +181,7 @@ public class Employee {
 			else if (nuovoRuoloInt == 2)
 				nuovoRuolo = "Sviluppatore";
 			else if (nuovoRuoloInt == 3) {
-				
-				//call a method to assign a bonus to the manager that i still need to write 
+				Manager.addManager(conn, id);
 				nuovoRuolo = "Manager";}
 
 			String query = "UPDATE dipendenti SET ruolo = ? WHERE iddipendenti = ?";
@@ -175,6 +201,13 @@ public class Employee {
 				e.printStackTrace();
 			}
 		}
+		
+		 /**
+	     * Modifica lo stipendio del dipendente.
+	     *
+	     * @param id    			id del dipendente
+	     * @param stipendio     	nuovo stipendio del dipendente
+	     */
 
 		public static void updateEmployeeSalary(Connection conn, Scanner scan) {
 			
@@ -225,6 +258,13 @@ public class Employee {
 			}
 
 		}
+		
+		
+		 /**
+	     * Elimina un dipendente dalla tabella DIPENDENTI.
+	     *
+	     * @param id    			id del dipendente
+	     */
 
 		public static void deleteEmployee(Connection conn, Scanner scan) {
 
